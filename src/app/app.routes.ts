@@ -1,16 +1,13 @@
-
+// src/app/app.routes.ts
 
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component'; // Importé pour type hinting, bien que loadComponent soit utilisé
 import { LoginComponent } from './auth/pages/login/login.component'; // Importé pour type hinting
 import { AccueilComponent } from './accueil/accueil.component'; // Pour la page d'accueil
-//import { MainLayoutComponent } from './shared/components/main-layout/main-layout.component'; // Assurez-vous que le chemin est correct
 import { MainLayoutComponent } from './shared/main-layout/main-layout.component';
 import { AuthGuard } from './auth/guards/auth.guard'; // Importez de AuthGuard 
 import { RouterListComponent } from './routeurs/router-list/router-list.component';
 import { RouterFormComponent } from './routeurs/router-form/router-form.component';
-
-
 
 
 export const routes: Routes = [
@@ -51,6 +48,8 @@ export const routes: Routes = [
     ]
   },
 
+
+
   // 5. Route de fallback (page 404 ou redirection)
-  { path: '**', redirectTo: 'accueil' } // Toute URL non trouvée renverra à la page d'accueil
+  //{ path: '**', redirectTo: 'accueil' } // Toute URL non trouvée renverra à la page d'accueil
 ];

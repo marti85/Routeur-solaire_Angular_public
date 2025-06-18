@@ -26,7 +26,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Pour Chart.js
   private chartInstance: Chart | null = null;
   private routerSubscription: Subscription | undefined;
-  private mesureSubscription: Subscription | undefined;
+  //private mesureSubscription: Subscription | undefined;
+  private mesureSubscription: any; // Pour gérer la désinscription
 
   constructor(
     private routerService: RouterService,
@@ -55,6 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.routeurs = data;
         if (this.routeurs.length > 0) {
           // Sélectionnez le premier routeur par défaut si aucun n'est sélectionné
+          console.error('Selectio routeur');
           if (!this.selectedRouteurId) {
             this.selectedRouteurId = this.routeurs[0].id!; // Utilisez ! car l'id existe après chargement
           }
@@ -82,13 +84,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadMesuresForSelectedRouteur(routeurId: number): void {
+    console.log('Loading measures for routeur ID:', routeurId); // Log l'ID passé
     this.mesureSubscription = this.mesureService.getMesuresByRouteur(routeurId).subscribe({
       next: (data) => {
+        console.log('Measures received:', data); // Log les données reçues
         this.mesures = data;
         this.errorMessage = null;
-        this.renderChart(); // Mettre à jour le graphique avec les nouvelles mesures
+        // Utilisez setTimeout pour s'assurer que le DOM est mis à jour
+        if (this.mesures.length > 0) {
+          setTimeout(() => {
+            this.renderChart(); // Appelez renderChart après un court délai
+          }, 0); // Le délai de 0 ms suffit pour décharger la tâche
+        } else {
+          // Si aucune mesure, assurez-vous que le graphique est détruit et le message approprié affiché
+          if (this.chartInstance) {
+            this.chartInstance.destroy();
+            this.chartInstance = null;
+          }
+        }
       },
       error: (err) => {
+        console.error('Error loading measures:', err); // Log les erreurs
         this.errorMessage = 'Erreur lors du chargement des mesures: ' + err.message;
         console.error('Failed to load mesures:', err);
         this.mesures = []; // Vider les mesures en cas d'erreur
@@ -107,7 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const canvas = document.getElementById('mesuresChart') as HTMLCanvasElement;
     if (!canvas) {
-      console.error("Canvas element 'mesuresChart' not found!");
+      console.error("Canvas element with ID 'mesuresChart' not found!");
       return;
     }
     const ctx = canvas.getContext('2d');

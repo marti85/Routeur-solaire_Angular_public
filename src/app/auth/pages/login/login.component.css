@@ -1,0 +1,60 @@
+/* src/app/auth/pages/login/login.component.css */
+
+.login-wrapper {
+    display: flex; /* Utilise Flexbox pour centrer */
+    justify-content: center; /* Centre horizontalement */
+    align-items: center; /* Centre verticalement */
+    min-height: 100vh; /* Prend toute la hauteur de la fenêtre */
+    background-color: #f8f9fa; /* Couleur de fond légère pour la page */
+}
+
+.card {
+    /* Largeur maximale pour le formulaire. Ajustez cette valeur. */
+    max-width: 450px; 
+    width: 100%; /* S'assure qu'il utilise toute la largeur disponible jusqu'à max-width */
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); /* Une ombre plus prononcée que le 'shadow-sm' de Bootstrap si vous voulez */
+}
+
+/* Styles pour le titre */
+.card-title {
+    color: #343a40; /* Couleur de texte plus sombre */
+}
+
+/* Styles pour les labels */
+.form-label {
+    font-weight: 500;
+}
+
+/* Styles pour le bouton */
+.btn-success {
+    background-color: #28a745; /* Vert de succès de Bootstrap */
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Styles pour les liens (Mot de passe oublié, S'inscrire) */
+.text-success {
+    color: #28a745 !important; /* Force la couleur verte de Bootstrap */
+}
+
+.text-success:hover {
+    text-decoration: underline;
+}
+
+/* Ajustement pour l'alignement du "Mot de passe oublié?" */
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+.form-check-label {
+    flex-grow: 1; /* Permet au label de prendre l'espace restant */
+}

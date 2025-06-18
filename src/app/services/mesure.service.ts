@@ -28,10 +28,19 @@ export class MesureService {
 
   // >>>>>> Assurez-vous que cette méthode est définie comme ci-dessous <<<<<<
   public getMesuresByRouteur(routeurId: number): Observable<Mesure[]> { // <<<<<< Ajout de 'public' si manquant
+    console.log('GetMesures');
     return this.http.get<Mesure[]>(`${this.apiMesuresUrl}?routeur_id=${routeurId}`).pipe(
       catchError(this.handleError)
     );
   }
+
+//getMesuresByRouteur(routeurId: number): Observable<Mesure[]> {
+//  const url = `<span class="math-inline">\{this\.apiMesuresUrl\}?routeur\_id\=</span>{routeurId}`;
+//  console.log('MesureService: Fetching from URL:', url); // Log l'URL construite
+//  return this.http.get<Mesure[]>(url).pipe(
+//    catchError(this.handleError)
+//  );
+//}
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('MesureService: Une erreur est survenue:', error);
