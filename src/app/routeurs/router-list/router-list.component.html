@@ -1,0 +1,42 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Mes Routeurs</h1>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">Liste des routeurs</h6>
+      <button class="btn btn-primary btn-sm" [routerLink]="['/routeurs/creer']">Ajouter un routeur</button>
+      </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Type</th>
+              <th>Identifiant</th>
+              <th>Propriétaire</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let routeur of routeurs">
+              <td>{{ routeur.nom }}</td>
+              <td>{{ routeur.type_nom }}</td> <td>{{ routeur.identifiant }}</td>
+              <td>{{ routeur.user_username }}</td> <td>
+                <button class="btn btn-info btn-sm me-2" [routerLink]="['/routeurs/modifier', routeur.id]">Modifier</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteRouteur(routeur.id)">Supprimer</button>
+              </td>
+            </tr>
+            <tr *ngIf="routeurs.length === 0">
+              <td colspan="5" class="text-center">Aucun routeur trouvé.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

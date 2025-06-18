@@ -1,0 +1,56 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Tableau de Bord</h1>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Sélectionner un Routeur</h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="routeurSelect" class="form-label">Choisissez un routeur :</label>
+          <select class="form-select" id="routeurSelect" [(ngModel)]="selectedRouteurId" (change)="onRouteurSelect()">
+            <option [ngValue]="null" disabled>-- Sélectionnez un routeur --</option>
+            <option *ngFor="let routeur of routeurs" [ngValue]="routeur.id">{{ routeur.nom }} ({{ routeur.identifiant }})</option>
+          </select>
+          <div *ngIf="routeurs.length === 0 && !errorMessage" class="text-muted mt-2">
+            Aucun routeur disponible. Veuillez ajouter des routeurs.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="selectedRouteurId && mesures.length > 0" class="card shadow mb-4 mt-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Mesures pour le routeur sélectionné</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+            <canvas id="mesuresChart"></canvas>
+        </div>
+      <h5 class="mt-4">Détails des dernières mesures:</h5>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let mesure of mesures | slice:0:10"> Puissance: {{ mesure.puissance_solaire }} W - Temps: {{ mesure.timestamp | date:'medium' }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div *ngIf="selectedRouteurId && mesures.length === 0 && !errorMessage" class="card shadow mb-4 mt-4">
+    <div class="card-body">
+      <p class="text-center text-muted">Aucune mesure disponible pour ce routeur.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!selectedRouteurId && routeurs.length > 0" class="card shadow mb-4 mt-4">
+    <div class="card-body">
+      <p class="text-center text-muted">Veuillez sélectionner un routeur pour voir ses mesures.</p>
+    </div>
+  </div>
+
+</div>

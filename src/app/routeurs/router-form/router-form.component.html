@@ -1,0 +1,56 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">{{ isEditMode ? 'Modifier le routeur' : 'Ajouter un nouveau routeur' }}</h1>
+
+  <div *ngIf="successMessage" class="alert alert-success" role="alert">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    {{ errorMessage }}
+  </div>
+
+  <div class="card shadow mb-4">
+    <div class="card-body">
+      <form [formGroup]="routeurForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="nom" class="form-label">Nom du routeur <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="nom" formControlName="nom" required>
+          <div *ngIf="routeurForm.get('nom')?.invalid && (routeurForm.get('nom')?.dirty || routeurForm.get('nom')?.touched)" class="text-danger">
+            Le nom est requis.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="type" class="form-label">Type de routeur <span class="text-danger">*</span></label>
+          <select class="form-select" id="type" formControlName="type" required>
+            <option value="" disabled selected>Sélectionnez un type</option>
+            <option *ngFor="let type of routeurTypes" [value]="type.id">{{ type.nom_type }}</option>
+          </select>
+          <div *ngIf="routeurForm.get('type')?.invalid && (routeurForm.get('type')?.dirty || routeurForm.get('type')?.touched)" class="text-danger">
+            Le type est requis.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="identifiant" class="form-label">Identifiant (UUID) <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="identifiant" formControlName="identifiant" required>
+          <div *ngIf="routeurForm.get('identifiant')?.invalid && (routeurForm.get('identifiant')?.dirty || routeurForm.get('identifiant')?.touched)" class="text-danger">
+            L'identifiant est requis.
+          </div>
+        </div>
+
+        <div class="mb-3" *ngIf="!isEditMode"> <label for="code_securite" class="form-label">Code de sécurité <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="code_securite" formControlName="code_securite" [required]="!isEditMode">
+          <div *ngIf="routeurForm.get('code_securite')?.invalid && (routeurForm.get('code_securite')?.dirty || routeurForm.get('code_securite')?.touched)" class="text-danger">
+            Le code de sécurité est requis.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="routeurForm.invalid">
+          {{ isEditMode ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="angularRouter.navigate(['/routeurs'])">Annuler</button>
+      </form>
+    </div>
+  </div>
+</div>

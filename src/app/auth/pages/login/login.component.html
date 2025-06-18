@@ -1,0 +1,31 @@
+<h2 class="card-title text-center mb-4">Connexion</h2>
+<form (ngSubmit)="onLogin()" #loginForm="ngForm">
+  <div class="mb-3">
+    <label for="username" class="form-label">Nom d'utilisateur</label>
+    <input type="text" class="form-control" id="username" name="username" [(ngModel)]="credentials.username" required>
+    <div *ngIf="loginForm.controls['username']?.invalid && (loginForm.controls['username']?.dirty || loginForm.controls['username']?.touched)" class="text-danger small">
+      <div *ngIf="loginForm.controls['username']?.errors?.['required']">Le nom d'utilisateur est requis.</div>
+    </div>
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Mot de passe</label>
+    <input type="password" class="form-control" id="password" name="password" [(ngModel)]="credentials.password" required>
+    <div *ngIf="loginForm.controls['password']?.invalid && (loginForm.controls['password']?.dirty || loginForm.controls['password']?.touched)" class="text-danger small">
+      <div *ngIf="loginForm.controls['password']?.errors?.['required']">Le mot de passe est requis.</div>
+    </div>
+  </div>
+  <div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+    <label class="form-check-label" for="rememberMe">
+      Se souvenir de moi
+    </label>
+    <a href="#" class="float-end text-success">Mot de passe oublié?</a>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+    {{ errorMessage }}
+  </div>
+
+  <button type="submit" class="btn btn-success w-100" [disabled]="loginForm.invalid">Se connecter</button>
+</form>
+<p class="text-center mt-3 ">Pas encore de compte ? <a routerLink="/auth/register" class="text-success">S'inscrire</a></p>
