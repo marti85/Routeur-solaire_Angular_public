@@ -55,7 +55,7 @@ export class RouterFormComponent implements OnInit {
         // Assurez-vous que les champs ici correspondent à votre modèle Django.
         this.routeurForm.patchValue({
           nom: routeur.nom,
-          type: routeur.type, // L'ID du type
+          type: routeur.type_de_routeur, // L'ID du type
           identifiant: routeur.identifiant,
           // code_securite n'est pas retourné par le serializer en lecture,
           // donc ne pas essayer de le patcher ici.

@@ -7,19 +7,36 @@
 
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">Sélectionner un Routeur</h6>
+      <h6 class="m-0 font-weight-bold text-primary">Sélectionner un Routeur et une Période</h6>
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
           <label for="routeurSelect" class="form-label">Choisissez un routeur :</label>
-          <select class="form-select" id="routeurSelect" [(ngModel)]="selectedRouteurId" (change)="onRouteurSelect()">
-            <option [ngValue]="null" disabled>-- Sélectionnez un routeur --</option>
+          <select class="form-select" id="routeurSelect"
+                  [(ngModel)]="selectedRouteurId"
+                  (change)="onSelectionChange()"> <option [ngValue]="null" disabled>-- Sélectionnez un routeur --</option>
             <option *ngFor="let routeur of routeurs" [ngValue]="routeur.id">{{ routeur.nom }} ({{ routeur.identifiant }})</option>
           </select>
           <div *ngIf="routeurs.length === 0 && !errorMessage" class="text-muted mt-2">
             Aucun routeur disponible. Veuillez ajouter des routeurs.
           </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="dateSelect" class="form-label">Sélectionner une date :</label>
+          <input type="date" class="form-control" id="dateSelect"
+                 [(ngModel)]="selectedDate"
+                 (change)="onSelectionChange()"> </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="periodSelect" class="form-label">Afficher par :</label>
+          <select class="form-select" id="periodSelect"
+                  [(ngModel)]="selectedPeriod"
+                  (change)="onSelectionChange()"> <option value="day">Jour</option>
+            <option value="month">Mois</option>
+            <option value="year">Année</option>
+          </select>
         </div>
       </div>
     </div>
@@ -35,7 +52,8 @@
         </div>
       <h5 class="mt-4">Détails des dernières mesures:</h5>
       <ul class="list-group">
-        <li class="list-group-item" *ngFor="let mesure of mesures | slice:0:10"> Puissance: {{ mesure.puissance_solaire }} W - Temps: {{ mesure.timestamp | date:'medium' }}
+        <li class="list-group-item" *ngFor="let mesure of mesures | slice:0:10">
+          Puissance: {{ mesure.puissance_solaire }} W - Temps: {{ mesure.timestamp | date:'medium' }}
         </li>
       </ul>
     </div>
@@ -43,7 +61,7 @@
 
   <div *ngIf="selectedRouteurId && mesures.length === 0 && !errorMessage" class="card shadow mb-4 mt-4">
     <div class="card-body">
-      <p class="text-center text-muted">Aucune mesure disponible pour ce routeur.</p>
+      <p class="text-center text-muted">Aucune mesure disponible pour ce routeur avec la date et la période sélectionnées.</p>
     </div>
   </div>
 

@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <h1 class="h3 mb-4 text-gray-800">Configuration de l'application</h1>
+
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Paramètres généraux</h6>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="saveConfiguration()">
+        <div class="mb-3">
+          <label for="appName" class="form-label">Nom de l'application</label>
+          <input type="text" class="form-control" id="appName" [(ngModel)]="appName" name="appName">
+        </div>
+        <div class="mb-3">
+          <label for="apiBaseUrl" class="form-label">URL de base de l'API</label>
+          <input type="url" class="form-control" id="apiBaseUrl" [(ngModel)]="apiBaseUrl" name="apiBaseUrl">
+        </div>
+        <div class="mb-3">
+          <label for="refreshInterval" class="form-label">Intervalle de rafraîchissement des données (secondes)</label>
+          <input type="number" class="form-control" id="refreshInterval" [(ngModel)]="refreshInterval" name="refreshInterval">
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer les changements</button>
+      </form>
+    </div>
+  </div>
+</div>

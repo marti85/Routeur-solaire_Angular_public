@@ -35,6 +35,8 @@ export const routes: Routes = [
       { path: 'routeurs', component: RouterListComponent }, // Route pour la liste des routeurs
       { path: 'routeurs/creer', component: RouterFormComponent }, // Route pour ajouter un routeur
       { path: 'routeurs/modifier/:id', component: RouterFormComponent }, // Route pour modifier un routeur
+
+      { path: 'configuration', loadComponent: () => import('./configuration/configuration-page/configuration-page.component').then(m => m.ConfigurationPageComponent) },
       // Ajoutez ici d'autres routes qui doivent apparaître AVEC le MainLayout (header, sidebar)
       // Par exemple:
       // {

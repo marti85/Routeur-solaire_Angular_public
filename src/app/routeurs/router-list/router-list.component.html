@@ -9,7 +9,7 @@
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
       <h6 class="m-0 font-weight-bold text-primary">Liste des routeurs</h6>
       <button class="btn btn-primary btn-sm" [routerLink]="['/routeurs/creer']">Ajouter un routeur</button>
-      </div>
+    </div>
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -19,23 +19,109 @@
               <th>Type</th>
               <th>Identifiant</th>
               <th>Propriétaire</th>
-              <th>Actions</th>
-            </tr>
+              <th>Statut Connexion</th> <th>Actions Routeur</th>
+              <th>Actions Appareils</th> </tr>
           </thead>
           <tbody>
             <tr *ngFor="let routeur of routeurs">
               <td>{{ routeur.nom }}</td>
-              <td>{{ routeur.type_nom }}</td> <td>{{ routeur.identifiant }}</td>
-              <td>{{ routeur.user_username }}</td> <td>
+              <td>{{ routeur.type_de_routeur }}</td> <td>{{ routeur.identifiant }}</td>
+              <td>{{ routeur.user_username }}</td>
+              <td>
+                <span [ngClass]="{'text-success': routeur.last_connection_status === 'SUCCESS', 'text-danger': routeur.last_connection_status === 'FAILURE'}">
+                  {{ routeur.last_connection_status || 'N/A' }}
+                </span>
+                <button class="btn btn-info btn-sm ms-2" (click)="performConnectionTest(routeur.id!)">Tester</button>
+              </td>
+              <td>
                 <button class="btn btn-info btn-sm me-2" [routerLink]="['/routeurs/modifier', routeur.id]">Modifier</button>
-                <button class="btn btn-danger btn-sm" (click)="deleteRouteur(routeur.id)">Supprimer</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteRouteur(routeur.id!)">Supprimer</button>
+              </td>
+              <td>
+                <button class="btn btn-success btn-sm" (click)="openConfigureModal(routeur)">Gérer Appareils</button>
               </td>
             </tr>
             <tr *ngIf="routeurs.length === 0">
-              <td colspan="5" class="text-center">Aucun routeur trouvé.</td>
-            </tr>
+              <td colspan="7" class="text-center">Aucun routeur trouvé.</td> </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="configureAppareilModal" tabindex="-1" aria-labelledby="configureAppareilModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg"> <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="configureAppareilModalLabel">Gestion des Appareils pour {{ currentRouteurName }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h6 class="mb-3">{{ isEditAppareilMode ? 'Modifier' : 'Ajouter' }} un Appareil :</h6>
+        <form (ngSubmit)="saveAppareil()">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="appareilNom" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="appareilNom" [(ngModel)]="newAppareil.nom" name="nom" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="appareilType" class="form-label">Type</label>
+              <input type="text" class="form-control" id="appareilType" [(ngModel)]="newAppareil.type" name="type" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="appareilPuissanceMax" class="form-label">Puissance Max (W)</label>
+              <input type="number" class="form-control" id="appareilPuissanceMax" [(ngModel)]="newAppareil.puissance_max" name="puissance_max" required>
+            </div>
+          </div>
+
+          <h6 class="mt-2 mb-3">Configuration de l'appareil:</h6>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="configSeuil" class="form-label">Seuil d'activation (W)</label>
+              <input type="number" class="form-control" id="configSeuil" [(ngModel)]="newConfiguration.seuil_activation" name="seuil_activation" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="configDebut" class="form-label">Plage horaire début (HH:MM)</label>
+              <input type="time" class="form-control" id="configDebut" [(ngModel)]="newConfiguration.plage_horaire_debut" name="plage_horaire_debut" required>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="configFin" class="form-label">Plage horaire fin (HH:MM)</label>
+              <input type="time" class="form-control" id="configFin" [(ngModel)]="newConfiguration.plage_horaire_fin" name="plage_horaire_fin" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2 mb-4">{{ isEditAppareilMode ? 'Mettre à jour l\'appareil' : 'Ajouter l\'appareil' }}</button>
+          <button type="button" *ngIf="isEditAppareilMode" class="btn btn-secondary mt-2 mb-4 ms-2" (click)="resetAppareilForm()">Nouvel Appareil</button>
+        </form>
+
+        <hr class="my-4">
+
+        <h6>Appareils configurés pour ce routeur:</h6>
+        <div *ngIf="currentRouteurAppareils && currentRouteurAppareils.length > 0; else noAppareils">
+          <ul class="list-group">
+            <li class="list-group-item d-flex align-items-center justify-content-between" *ngFor="let appareil of currentRouteurAppareils">
+              <div>
+                <strong>{{ appareil.nom }}</strong> ({{ appareil.type }}) - {{ appareil.puissance_max }} W
+                <div *ngIf="appareil.configuration" class="ms-3 text-muted small">
+                  Seuil: {{ appareil.configuration.seuil_activation }} W | Plage: {{ appareil.configuration.plage_horaire_debut | slice:0:5 }} - {{ appareil.configuration.plage_horaire_fin | slice:0:5 }}
+                </div>
+                <div *ngIf="!appareil.configuration" class="ms-3 text-warning small">
+                  (Configuration manquante)
+                </div>
+              </div>
+              <div class="ms-auto">
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="openConfigureModalForEdit(appareil)">Modifier</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteAppareil(appareil.id!)">Supprimer</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noAppareils>
+          <div class="text-muted">Aucun appareil configuré pour ce routeur.</div>
+        </ng-template>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
       </div>
     </div>
   </div>

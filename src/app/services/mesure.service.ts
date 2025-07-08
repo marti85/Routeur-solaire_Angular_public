@@ -1,13 +1,14 @@
 // src/app/services/mesure.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export interface Mesure {
   id?: number;
   puissance_solaire: number;
+  puissance_soutiree: number;
   timestamp: string;
   routeur: number;
 }
@@ -26,10 +27,24 @@ export class MesureService {
     );
   }
 
-  // >>>>>> Assurez-vous que cette méthode est définie comme ci-dessous <<<<<<
-  public getMesuresByRouteur(routeurId: number): Observable<Mesure[]> { // <<<<<< Ajout de 'public' si manquant
-    console.log('GetMesures');
-    return this.http.get<Mesure[]>(`${this.apiMesuresUrl}?routeur_id=${routeurId}`).pipe(
+  public getMesuresByRouteur(
+    routeurId: number,
+    startDate?: string, // Format 'YYYY-MM-DD'
+    endDate?: string    // Format 'YYYY-MM-DD'
+  ): Observable<Mesure[]> {
+    console.log('MesureService: Requête pour mesures, routeur ID:', routeurId, 'startDate:', startDate, 'endDate:', endDate);
+
+    let params = new HttpParams();
+    params = params.append('routeur', routeurId.toString());
+
+    if (startDate) {
+      params = params.append('start_date', startDate);
+    }
+    if (endDate) {
+      params = params.append('end_date', endDate);
+    }
+
+    return this.http.get<Mesure[]>(this.apiMesuresUrl, { params: params }).pipe(
       catchError(this.handleError)
     );
   }
