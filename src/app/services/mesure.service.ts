@@ -13,11 +13,22 @@ export interface Mesure {
   routeur: number;
 }
 
+export interface AgregeeMesure { // Interface pour les mesures agrégées
+  id?: number;
+  routeur: number;
+  date_heure_debut: string; // Début de la période agrégée
+  date_heure_fin: string;   // Fin de la période agrégée (optionnel si le backend n'envoie que debut)
+  puissance_solaire_moyenne: number; // Puissance solaire agrégée (ex: moyenne)
+  puissance_soutiree_moyenne: number; // Puissance soutirée agrégée (ex: moyenne)
+  // Ajoutez d'autres champs agrégés si votre API les fournit (ex: puissance_solaire_totale)
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class MesureService {
   private apiMesuresUrl = 'http://localhost:8000/api/mesures/';
+  private apiAgregeeMesuresUrl = 'http://localhost:8000/api/mesures-agregees/';
 
   constructor(private http: HttpClient) { }
 
@@ -49,13 +60,33 @@ export class MesureService {
     );
   }
 
-//getMesuresByRouteur(routeurId: number): Observable<Mesure[]> {
-//  const url = `<span class="math-inline">\{this\.apiMesuresUrl\}?routeur\_id\=</span>{routeurId}`;
-//  console.log('MesureService: Fetching from URL:', url); // Log l'URL construite
-//  return this.http.get<Mesure[]>(url).pipe(
-//    catchError(this.handleError)
-//  );
-//}
+  // Méthode pour les mesures agrégées
+  public getMesuresAgregeesByRouteur(
+    routeurId: number,
+    startDate?: string,
+    endDate?: string,
+    period?: 'day' | 'month' | 'year' // Pour envoyer au backend le niveau d'agrégation souhaité
+  ): Observable<AgregeeMesure[]> {
+    console.log('MesureService: Requête pour mesures agrégées, routeur ID:', routeurId, 'startDate:', startDate, 'endDate:', endDate, 'period:', period);
+
+    let params = new HttpParams();
+    params = params.append('routeur', routeurId.toString());
+
+    if (startDate) {
+      params = params.append('start_date', startDate);
+    }
+    if (endDate) {
+      params = params.append('end_date', endDate);
+    }
+    if (period) {
+        params = params.append('period', period); // Le backend utilisera ceci pour savoir comment agréger
+    }
+
+    return this.http.get<AgregeeMesure[]>(this.apiAgregeeMesuresUrl, { params: params }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('MesureService: Une erreur est survenue:', error);

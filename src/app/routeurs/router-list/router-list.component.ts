@@ -113,6 +113,11 @@ export class RouterListComponent implements OnInit, OnDestroy { // Implémentez 
       const bsModal = new bootstrap.Modal(modalElement);
       bsModal.show();
     }
+    // Charge les appareils après l'ouverture de la modale
+    if (this.currentRouteurId) {
+      this.refreshCurrentRouteurAppareils();
+    }
+
   }
 
   // Ouvre la modale pour modifier un appareil spécifique
