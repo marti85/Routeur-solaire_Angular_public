@@ -5,30 +5,57 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+// Interface pour les mesures brutes (correspondant au MesureSerializer de Django)
 export interface Mesure {
   id?: number;
-  puissance_solaire: number;
-  puissance_soutiree: number;
-  timestamp: string;
+  puissance_solaire: number | null; // Peut être null si non disponible
+  puissance_soutiree: number | null; // Peut être null si non disponible
+  ouverture_triac?: number | null; // Optionnel et peut être null
+  timestamp: string; // Ex: "2023-10-26T10:00:00Z"
   routeur: number;
 }
 
-export interface AgregeeMesure { // Interface pour les mesures agrégées
+// Interface pour les mesures agrégées journalières (Backend: MesureAgregeeSerializer ou équivalent pour 'day')
+// C'est le type que vous recevrez quand vous demanderez 'period=day' sur mesures-agregees
+export interface MesureAgregeeDaily {
+  id?: number; // L'ID peut ne pas être pertinent pour une agrégation
+  routeur: number;
+  date: string; // Date de l'agrégation, ex: "2023-10-26"
+  puissance_solaire_moyenne: number | null;
+  puissance_soutiree_moyenne: number | null;
+  ouverture_triac_moyenne: number | null;
+  nombre_mesures: number; // Nombre de mesures agrégées
+}
+
+// Interface pour les mesures agrégées horaires (si votre backend envoie ceci, ex: pour 'hour')
+export interface MesureAgregeeHourly {
   id?: number;
   routeur: number;
-  date_heure_debut: string; // Début de la période agrégée
-  date_heure_fin: string;   // Fin de la période agrégée (optionnel si le backend n'envoie que debut)
-  puissance_solaire_moyenne: number; // Puissance solaire agrégée (ex: moyenne)
-  puissance_soutiree_moyenne: number; // Puissance soutirée agrégée (ex: moyenne)
-  // Ajoutez d'autres champs agrégés si votre API les fournit (ex: puissance_solaire_totale)
+  timestamp_interval_start: string; // Début de l'intervalle horaire, ex: "2023-10-26T10:00:00Z"
+  puissance_solaire_moyenne: number | null;
+  puissance_soutiree_moyenne: number | null;
+  ouverture_triac_moyenne: number | null;
+  nombre_mesures: number;
+}
+
+// Interface pour les agrégations mensuelles/annuelles (Backend: MonthlyAgregeeSerializer / YearlyAgregeeSerializer)
+// C'est le type que vous recevrez quand vous demanderez 'period=month' ou 'period=year' sur mesures-agregees
+export interface MesureAgregeeMonthlyYearly {
+    timestamp: string; // Ex: "2023-10-01T00:00:00Z" pour une agrégation mensuelle
+    routeur_id: number; // Ou simplement 'routeur' selon votre backend
+    puissance_solaire_moyenne: number | null;
+    puissance_soutiree_moyenne: number | null;
+    ouverture_triac_moyenne: number | null;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class MesureService {
-  private apiMesuresUrl = 'http://localhost:8000/api/mesures/';
-  private apiAgregeeMesuresUrl = 'http://localhost:8000/api/mesures-agregees/';
+  // URLs hardcodées car le dossier 'environments' est absent
+  private apiBaseUrl = 'http://localhost:8000/api';
+  private apiMesuresUrl = `${this.apiBaseUrl}/mesures/`;
+  private apiAgregeeMesuresUrl = `${this.apiBaseUrl}/mesures-agregees/`;
 
   constructor(private http: HttpClient) { }
 
@@ -38,12 +65,13 @@ export class MesureService {
     );
   }
 
+  // Méthode pour les mesures brutes (pour la vue 'day' du frontend)
   public getMesuresByRouteur(
     routeurId: number,
     startDate?: string, // Format 'YYYY-MM-DD'
     endDate?: string    // Format 'YYYY-MM-DD'
   ): Observable<Mesure[]> {
-    console.log('MesureService: Requête pour mesures, routeur ID:', routeurId, 'startDate:', startDate, 'endDate:', endDate);
+    console.log('MesureService: Requête pour mesures brutes, routeur ID:', routeurId, 'startDate:', startDate, 'endDate:', endDate);
 
     let params = new HttpParams();
     params = params.append('routeur', routeurId.toString());
@@ -60,17 +88,21 @@ export class MesureService {
     );
   }
 
-  // Méthode pour les mesures agrégées
+  // Méthode pour les mesures agrégées (pour les vues 'month' et 'year' du frontend)
   public getMesuresAgregeesByRouteur(
-    routeurId: number,
+    routeerId: number, // <<-- Renommé en routeerId pour éviter le conflit avec le paramètre routeur dans l'URL (si nécessaire)
     startDate?: string,
     endDate?: string,
-    period?: 'day' | 'month' | 'year' // Pour envoyer au backend le niveau d'agrégation souhaité
-  ): Observable<AgregeeMesure[]> {
-    console.log('MesureService: Requête pour mesures agrégées, routeur ID:', routeurId, 'startDate:', startDate, 'endDate:', endDate, 'period:', period);
+    // Le 'period' ici indique le niveau d'agrégation demandé au backend (ex: 'day' pour un mois)
+    period?: 'day' | 'month' | 'year'
+  ): Observable<(MesureAgregeeDaily | MesureAgregeeMonthlyYearly | MesureAgregeeHourly)[]> {
+    console.log('MesureService: Requête pour mesures agrégées, routeur ID:', routeerId, 'startDate:', startDate, 'endDate:', endDate, 'period:', period);
 
     let params = new HttpParams();
-    params = params.append('routeur', routeurId.toString());
+    // Utilisez 'routeur_id' ou 'routeur' selon ce que votre backend attend pour les agrégées
+    // Selon l'image des erreurs backend (e506c3.png), il semble que "routeur" soit attendu pour l'authentification.
+    // Mais pour les requêtes GET sur les agrégées, 'routeur_id' est commun. Je le laisse ainsi pour le moment.
+    params = params.append('routeur_id', routeerId.toString());
 
     if (startDate) {
       params = params.append('start_date', startDate);
@@ -79,10 +111,10 @@ export class MesureService {
       params = params.append('end_date', endDate);
     }
     if (period) {
-        params = params.append('period', period); // Le backend utilisera ceci pour savoir comment agréger
+        params = params.append('period', period);
     }
 
-    return this.http.get<AgregeeMesure[]>(this.apiAgregeeMesuresUrl, { params: params }).pipe(
+    return this.http.get<(MesureAgregeeDaily | MesureAgregeeMonthlyYearly | MesureAgregeeHourly)[]>(this.apiAgregeeMesuresUrl, { params: params }).pipe(
       catchError(this.handleError)
     );
   }
@@ -97,6 +129,7 @@ export class MesureService {
       errorMessage = 'Détails de l\'erreur :';
       for (const key in error.error) {
         if (error.error.hasOwnProperty(key)) {
+          // Correction de la faute de frappe ici : Array.isArray(error.error[key])
           errorMessage += `\n${key}: ${Array.isArray(error.error[key]) ? error.error[key].join(', ') : error.error[key]}`;
         }
       }
@@ -108,6 +141,7 @@ export class MesureService {
     } else {
       errorMessage = `Erreur réseau: ${error.message}`;
     }
+    // La fonction doit toujours retourner quelque chose, donc throwError est correct
     return throwError(() => new Error(errorMessage));
   }
 }

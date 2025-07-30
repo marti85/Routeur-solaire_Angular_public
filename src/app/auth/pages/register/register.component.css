@@ -1,0 +1,37 @@
+/* register.component.css */
+
+.registration-card {
+    max-width: 500px; /* Largeur maximale pour le formulaire */
+    margin: 50px auto; /* Centre le bloc horizontalement et ajoute une marge en haut/bas */
+    padding: 30px; /* Espacement interne */
+    background-color: #ffffff; /* Fond blanc */
+    border-radius: 8px; /* Bords arrondis */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Une ombre plus prononcée */
+    border: 1px solid #e0e0e0; /* Une légère bordure */
+}
+
+/* Vous pouvez ajouter des styles pour les labels ou inputs si vous voulez plus de personnalisation */
+.registration-card .form-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.registration-card .form-control {
+    border-radius: 4px;
+}
+
+/* Style pour le titre */
+.registration-card h2 {
+    color: #343a40; /* Couleur sombre pour le texte */
+    margin-bottom: 25px; /* Plus d'espace sous le titre */
+    font-size: 1.8rem;
+}
+
+/* Pour le responsive design sur les petits écrans */
+@media (max-width: 768px) {
+    .registration-card {
+        max-width: 95%; /* Prend plus de largeur sur les écrans plus petits */
+        margin: 20px auto;
+        padding: 20px;
+    }
+}

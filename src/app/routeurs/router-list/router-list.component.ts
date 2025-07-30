@@ -30,6 +30,8 @@ export class RouterListComponent implements OnInit, OnDestroy { // Implémentez 
   currentRouteurName: string = '';
   currentRouteurAppareils: Appareil[] = []; // Pour afficher la liste des appareils dans la modale
 
+  appareilTypes: string[] = ['Relais', 'Triac'];
+
   newAppareil: Appareil = { nom: '', type: '', puissance_max: 0, routeur: 0 };
   newConfiguration: Configuration = { appareil: 0, seuil_activation: 0, plage_horaire_debut: '00:00', plage_horaire_fin: '23:59' };
   isEditAppareilMode: boolean = false;
@@ -149,7 +151,7 @@ export class RouterListComponent implements OnInit, OnDestroy { // Implémentez 
     this.isEditAppareilMode = false;
     this.editingAppareilId = null;
     this.editingConfigurationId = null;
-    this.newAppareil = { nom: '', type: '', puissance_max: 0, routeur: this.currentRouteurId! };
+    this.newAppareil = { nom: '', type: this.appareilTypes[0] , puissance_max: 0, routeur: this.currentRouteurId! };
     this.newConfiguration = { appareil: 0, seuil_activation: 0, plage_horaire_debut: '00:00', plage_horaire_fin: '23:59' };
   }
 

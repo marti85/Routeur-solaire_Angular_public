@@ -30,45 +30,57 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router) { }
 
-  onRegister(): void {
-    console.log('Tentative d\'inscription avec les données:', this.user);
+  onRegister() {
+  // Assurez-vous que l'objet this.user contient toutes les données nécessaires
+  console.log('Données utilisateur pour inscription :', this.user);
 
-    if (this.user.password !== this.user.password2) {
-      alert('Les mots de passe ne correspondent pas.');
-      return;
-    }
+  this.authService.register(this.user).pipe(
+    catchError(httpErrorResponse => {
+      // httpErrorResponse est l'objet HttpErrorResponse complet
+      console.error('Erreur lors de l\'inscription (HttpErrorResponse) :', httpErrorResponse);
 
-    // Vérification minimale que les champs essentiels sont remplis avant d'appeler l'API
-    if (this.user.username && this.user.email && this.user.password) {
-      // Appel réel au service d'authentification
-      this.authService.register(this.user).pipe(
-        catchError(error => {
-          // Gestion des erreurs de l'API
-          console.error('Erreur lors de l\'inscription :', error);
-          if (error.error && typeof error.error === 'object') {
-            // Afficher les erreurs spécifiques du backend (ex: email déjà pris, mot de passe trop faible)
-            let errorMessage = 'Erreur d\'inscription : ';
-            for (const key in error.error) {
-              if (error.error.hasOwnProperty(key)) {
-                errorMessage += `\n${key}: ${error.error[key]}`;
-              }
+      let errorMessage = 'Une erreur inattendue est survenue lors de l\'inscription.';
+
+      // Vérifiez si la réponse d'erreur contient un objet 'error' du backend
+      if (httpErrorResponse.error && typeof httpErrorResponse.error === 'object') {
+        const backendErrors = httpErrorResponse.error;
+        let detailedMessages: string[] = [];
+
+        // Itérer sur les clés de l'objet d'erreurs du backend (ex: 'username', 'email', 'password')
+        for (const key in backendErrors) {
+          if (backendErrors.hasOwnProperty(key)) {
+            // Chaque clé peut contenir un tableau de messages d'erreur (ex: ["A user with that username already exists."])
+            if (Array.isArray(backendErrors[key])) {
+              backendErrors[key].forEach((msg: string) => {
+                detailedMessages.push(`${key}: ${msg}`);
+              });
+            } else {
+              // Au cas où ce ne serait pas un tableau (moins courant pour DRF, mais possible)
+              detailedMessages.push(`${key}: ${backendErrors[key]}`);
             }
-            alert(errorMessage);
-          } else {
-            alert('Une erreur inattendue est survenue lors de l\'inscription.');
           }
-          return of(null); // Retourne un observable qui émet null pour que le flux se termine proprement
-        })
-      ).subscribe(response => {
-        if (response) { // S'assurer que la réponse n'est pas null à cause de catchError
-          console.log('Inscription réussie :', response);
-          alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-          this.router.navigate(['/auth/login']); // Redirige vers la page de connexion
         }
-      });
-    } else {
-      console.warn('Veuillez remplir tous les champs obligatoires du formulaire d\'inscription.');
-      alert('Veuillez remplir tous les champs obligatoires.');
+
+        if (detailedMessages.length > 0) {
+          errorMessage = 'Erreur d\'inscription : \n' + detailedMessages.join('\n');
+        } else {
+          // Si error.error est un objet mais vide ou non conforme à ce qui est attendu
+          errorMessage = 'Une erreur de validation est survenue, mais les détails sont inconnus.';
+        }
+      } else if (httpErrorResponse.message) {
+        // Gère les erreurs réseau ou autres erreurs HttpErrorResponse avec un message simple
+        errorMessage = `Erreur réseau ou client: ${httpErrorResponse.message}`;
+      }
+
+      alert(errorMessage);
+      return of(null); // Retourne un observable qui émet null pour que le flux se termine proprement
+    })
+  ).subscribe(response => {
+    if (response) { // S'assurer que la réponse n'est pas null à cause de catchError
+      console.log('Inscription réussie :', response);
+      alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+      this.router.navigate(['/auth/login']); // Redirige vers la page de connexion
     }
-  }
+  });
+}
 }

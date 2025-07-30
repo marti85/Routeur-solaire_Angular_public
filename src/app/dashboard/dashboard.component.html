@@ -15,8 +15,11 @@
           <label for="routeurSelect" class="form-label">Choisissez un routeur :</label>
           <select class="form-select" id="routeurSelect"
                   [(ngModel)]="selectedRouteurId"
-                  (change)="onSelectionChange()"> <option [ngValue]="null" disabled>-- Sélectionnez un routeur --</option>
-            <option *ngFor="let routeur of routeurs" [ngValue]="routeur.id">{{ routeur.nom }} ({{ routeur.identifiant }})</option>
+                  (change)="onSelectionChange()">
+            <option [ngValue]="null" disabled>-- Sélectionnez un routeur --</option>
+            <option *ngFor="let routeur of routeurs" [ngValue]="routeur.id">
+              {{ routeur.nom }} ({{ routeur.identifiant }})
+            </option>
           </select>
           <div *ngIf="routeurs.length === 0 && !errorMessage" class="text-muted mt-2">
             Aucun routeur disponible. Veuillez ajouter des routeurs.
@@ -27,13 +30,16 @@
           <label for="dateSelect" class="form-label">Sélectionner une date :</label>
           <input type="date" class="form-control" id="dateSelect"
                  [(ngModel)]="selectedDate"
-                 (change)="onSelectionChange()"> </div>
+                 (change)="onSelectionChange()">
+        </div>
 
         <div class="col-md-4 mb-3">
           <label for="periodSelect" class="form-label">Afficher par :</label>
           <select class="form-select" id="periodSelect"
                   [(ngModel)]="selectedPeriod"
-                  (change)="onSelectionChange()"> <option value="day">Jour</option>
+                  (change)="onSelectionChange()">
+            <option value="day">Jour</option>
+            <option value="week">Semaine</option> <!-- AJOUT -->
             <option value="month">Mois</option>
             <option value="year">Année</option>
           </select>
@@ -47,13 +53,22 @@
       <h6 class="m-0 font-weight-bold text-primary">Mesures pour le routeur sélectionné</h6>
     </div>
     <div class="card-body">
-        <div class="chart-container" style="position: relative; height:40vh; width:80vw">
-            <canvas id="mesuresChart"></canvas>
-        </div>
+      <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+        <canvas id="mesuresChart"></canvas>
+      </div>
+
       <h5 class="mt-4">Détails des dernières mesures:</h5>
       <ul class="list-group">
         <li class="list-group-item" *ngFor="let mesure of mesures | slice:0:10">
-          Puissance: {{ mesure.puissance_solaire }} W - Temps: {{ mesure.timestamp | date:'medium' }}
+          <div *ngIf="selectedPeriod === 'day'">
+            Puissance: {{ mesure.puissance_solaire }} W - Temps: {{ mesure.timestamp | date:'medium' }}
+          </div>
+          <div *ngIf="selectedPeriod !== 'day'">
+            Moyenne solaire: {{ mesure.puissance_solaire_moyenne }} W |
+            Moyenne soutirée: {{ mesure.puissance_soutiree_moyenne }} W |
+            Triac: {{ mesure.ouverture_triac_moyenne }} % - 
+            Date: {{ mesure.timestamp | date:'mediumDate' }}
+          </div>
         </li>
       </ul>
     </div>
@@ -70,5 +85,4 @@
       <p class="text-center text-muted">Veuillez sélectionner un routeur pour voir ses mesures.</p>
     </div>
   </div>
-
 </div>
