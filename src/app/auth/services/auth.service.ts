@@ -3,7 +3,7 @@
 
 // Importe les modules et classes nécessaires d'Angular et de RxJS.
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core'; // Core Angular
-import { HttpClient, HttpErrorResponse } from '@angular/common/http'; // Pour les requêtes HTTP
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http'; // Pour les requêtes HTTP
 import { Router } from '@angular/router'; // Pour la navigation entre les routes Angular
 import { BehaviorSubject, Observable, throwError } from 'rxjs'; // RxJS : BehaviorSubject pour un état observable, Observable pour les flux de données, throwError pour propager les erreurs
 import { tap, catchError } from 'rxjs/operators'; // RxJS Operators : tap pour les effets secondaires sans modifier le flux, catchError pour la gestion des erreurs
@@ -186,6 +186,30 @@ export class AuthService {
     }
     return null;
   }
+
+// -------------------------------------------------------------
+  // NOUVELLE MÉTHODE POUR LE CHANGEMENT DE MOT DE PASSE
+  // -------------------------------------------------------------
+  /**
+   * Envoie une requête de changement de mot de passe au backend.
+   * @param data L'objet contenant les mots de passe (actuel, nouveau, et confirmation).
+   * @returns Un Observable qui émet la réponse de l'API.
+   */
+  changePassword(data: any): Observable<any> {
+    const token = this.getAccessToken(); // Récupère le jeton d'accès
+    if (!token) {
+      return throwError(() => new Error('No access token available. User is not authenticated.'));
+    }
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    
+    return this.http.post(`${this.apiUrl}/change-password/`, data, { headers }).pipe(
+      catchError(error => {
+        return this.handleError(error);
+      })
+    );
+  }
+
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('An error occurred:', error);

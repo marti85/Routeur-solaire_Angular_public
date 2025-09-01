@@ -25,7 +25,8 @@
           <tbody>
             <tr *ngFor="let routeur of routeurs">
               <td>{{ routeur.nom }}</td>
-              <td>{{ routeur.type_de_routeur }}</td> <td>{{ routeur.identifiant }}</td>
+              <td>{{ routeur.nom_type }}</td> 
+              <td>{{ routeur.identifiant }}</td>
               <td>{{ routeur.user_username }}</td>
               <td>
                 <span [ngClass]="{'text-success': routeur.last_connection_status === 'SUCCESS', 'text-danger': routeur.last_connection_status === 'FAILURE'}">

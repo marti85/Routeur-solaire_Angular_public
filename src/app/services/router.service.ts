@@ -18,7 +18,7 @@ export interface Routeur {
   id?: number; // Optionnel pour la création (sera généré par Django)
   nom: string;
   identifiant: string; // UUID
-  type_de_routeur: string; // ID du RouteurType (ForeignKey)
+  nom_type?: string; // ID du RouteurType (ForeignKey)
   code_securite?: string; // Optionnel pour l'édition, requis pour la création
   user?: number; // ID de l'utilisateur (sera défini par le backend)
   user_username?: string; // Nom d'utilisateur du propriétaire (lecture seule du sérialiseur)
@@ -53,7 +53,7 @@ export class RouterService {
     });
   }
 
-  // --- Méthodes pour les Routeurs ---
+  // Méthodes pour les Routeurs 
 
   getRouteurs(): Observable<Routeur[]> {
     // Utiliser les headers d'authentification
@@ -82,9 +82,7 @@ export class RouterService {
     // Lors de la mise à jour, on n'envoie pas user, user_username, id, appareils.
     // code_securite n'est généralement pas mis à jour via ce formulaire.
     const { user, user_username, id: routerId, code_securite, appareils, last_connection_test, last_connection_status, ...dataToSend } = routeur;
-    return this.http.put<Routeur>(`${this.apiRoutersUrl}${id}/`, dataToSend, { headers: this.getAuthHeaders() }).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.put<Routeur>(`${this.apiRoutersUrl}${id}/`, dataToSend, { headers: this.getAuthHeaders() }).pipe(catchError(this.handleError));
   }
 
   deleteRouteur(id: number): Observable<any> {
