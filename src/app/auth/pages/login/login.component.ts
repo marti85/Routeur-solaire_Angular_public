@@ -10,11 +10,11 @@ import { of } from 'rxjs'; // Importez 'of'
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // Assurez-vous de bien avoir FormsModule ici
+  imports: [CommonModule, FormsModule, RouterLink], 
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit { // Implémentez OnInit
+export class LoginComponent implements OnInit { 
 
   // Propriété pour lier les entrées du formulaire (utilisation de ngModel)
   credentials = {
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit { // Implémentez OnInit
     // Réinitialise le message d'erreur à chaque nouvelle tentative
     this.errorMessage = null; 
 
-    // Vérification basique des champs (vous pouvez ajouter des validations plus complexes dans le HTML ou ici)
+    // Vérification des champs 
     if (!this.credentials.username || !this.credentials.password) {
       this.errorMessage = 'Veuillez renseigner le nom d\'utilisateur et le mot de passe.';
       console.warn('LoginComponent: Form credentials missing.');
@@ -53,11 +53,9 @@ export class LoginComponent implements OnInit { // Implémentez OnInit
     console.log('LoginComponent: Submitting credentials to AuthService:', this.credentials); // Log des credentials envoyés
 
     this.authService.login(this.credentials).pipe(
-      // Utilisez le handleError de l'AuthService si vous l'avez configuré pour retourner un throwError
       // Si handleError renvoie un Observable<never> ou throwError, ce catchError pourrait être simplifié
       catchError((error: HttpErrorResponse) => {
         console.error('LoginComponent: Login error caught in component:', error);
-        
         let clientErrorMessage = 'Échec de la connexion. Veuillez vérifier vos identifiants.';
         
         // Tentative d'extraire un message d'erreur plus spécifique du backend
@@ -89,11 +87,10 @@ export class LoginComponent implements OnInit { // Implémentez OnInit
       if (response) { 
         console.log('LoginComponent: Login successful, navigating to dashboard.');
         // Normalement, la redirection est déjà gérée dans AuthService.login()
-        // Si ce n'est pas le cas, ou si vous voulez la gérer ici:
         this.router.navigate(['/dashboard']); 
       } else {
         console.log('LoginComponent: Login failed (response was null after error handling).');
-        // Ne faites rien ici car errorMessage a déjà été mis à jour par catchError
+        // Ne rien faire ici car errorMessage a déjà été mis à jour par catchError
       }
     });
   }
