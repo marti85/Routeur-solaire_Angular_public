@@ -35,7 +35,7 @@ export class RouterService {
   private apiRoutersUrl = 'http://localhost:8000/api/routeurs/';
   private apiRouterTypesUrl = 'http://localhost:8000/api/router-types/'; // Pour récupérer les types
 
-  constructor(private http: HttpClient, private authService: AuthService) { } // Injectez AuthService
+  constructor(private http: HttpClient, private authService: AuthService) { } // Injection de AuthService
 
   // Méthode pour obtenir les headers d'authentification
   private getAuthHeaders(): HttpHeaders {
