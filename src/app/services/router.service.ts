@@ -80,7 +80,6 @@ export class RouterService {
 
   updateRouteur(id: number, routeur: Routeur): Observable<Routeur> {
     // Lors de la mise à jour, on n'envoie pas user, user_username, id, appareils.
-    // code_securite n'est généralement pas mis à jour via ce formulaire.
     const { user, user_username, id: routerId, code_securite, appareils, last_connection_test, last_connection_status, ...dataToSend } = routeur;
     return this.http.put<Routeur>(`${this.apiRoutersUrl}${id}/`, dataToSend, { headers: this.getAuthHeaders() }).pipe(catchError(this.handleError));
   }
