@@ -1,21 +1,21 @@
 // src/app/services/router.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http'; // Importez HttpHeaders
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http'; 
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Appareil } from './appareil.service';
-import { AuthService } from '../auth/services/auth.service'; // Gardez l'importation de AuthService
+import { AuthService } from '../auth/services/auth.service'; 
 
-// Interface pour le type de routeur (correspond à votre modèle RouteurType Django)
+// Interface pour le type de routeur (correspond au RouteurType Django)
 export interface RouteurType {
   id: number;
   nom_type: string;
 }
 
-// Interface pour un routeur (correspond à votre modèle Routeur Django et son Serializer)
+// Interface pour un routeur (correspond au modèle Routeur Django et son Serializer)
 export interface Routeur {
-  id?: number; // Optionnel pour la création (sera généré par Django)
+  id?: number; // Optionnel pour la création 
   nom: string;
   identifiant: string; // UUID
   nom_type?: string; // ID du RouteurType (ForeignKey)
@@ -32,7 +32,6 @@ export interface Routeur {
   providedIn: 'root'
 })
 export class RouterService {
-  // Ajustez l'URL pour qu'elle pointe vers votre API Django des routeurs
   private apiRoutersUrl = 'http://localhost:8000/api/routeurs/';
   private apiRouterTypesUrl = 'http://localhost:8000/api/router-types/'; // Pour récupérer les types
 
@@ -43,8 +42,6 @@ export class RouterService {
     const token = this.authService.getAccessToken(); // Appel à la méthode getToken() de AuthService
     if (!token) {
       console.error('No authentication token found. User might not be logged in.');
-      // Vous pourriez vouloir rediriger l'utilisateur vers la page de connexion ici
-      // ou lancer une erreur spécifique.
       return new HttpHeaders();
     }
     return new HttpHeaders({
@@ -119,8 +116,7 @@ export class RouterService {
       // Erreur côté client ou réseau
       errorMessage = `Erreur: ${error.error.message}`;
     } else if (error.error && typeof error.error === 'object') {
-      // Erreur retournée par le serveur (ex: validation)
-      // Tenter d'extraire un message d'erreur plus spécifique
+      // Erreur retournée par le serveur
       if (error.error.detail) {
         errorMessage = `Erreur: ${error.error.detail}`;
       } else {
@@ -141,7 +137,7 @@ export class RouterService {
       // Autre type d'erreur
       errorMessage = `Erreur réseau: ${error.message}`;
     }
-    // Utilisez throwError pour renvoyer une erreur observable
+    // Utiliser throwError pour renvoyer une erreur observable
     return throwError(() => new Error(errorMessage));
   }
 }
